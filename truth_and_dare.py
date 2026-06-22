@@ -3,7 +3,7 @@ import time
 import os
 import sys
 
-# Terminal Colors
+# Terminal Colors for a Premium UI/UX
 class Colors:
     HEADER = '\033[95m'
     BLUE = '\033[94m'
@@ -14,7 +14,7 @@ class Colors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
 
-# Player Blueprint
+# Player Blueprint (OOPs Concept)
 class Player:
     def __init__(self, name):
         self.name = name
@@ -26,7 +26,7 @@ class Player:
     def deduct_points(self, points):
         self.score -= points
 
-# Main Game Engine
+# Main Game Engine (OOPs Concept)
 class TruthAndDareGame:
     def __init__(self):
         self.players = []
@@ -50,24 +50,35 @@ class TruthAndDareGame:
     def clear_screen(self):
         os.system('cls' if os.name == 'nt' else 'clear')
 
+    # Hardware audio trigger (\a triggers the motherboard beep speaker)
     def play_beep(self):
         sys.stdout.write('\a')
         sys.stdout.flush()
 
+    # Big ASCII Header text at startup
+    def show_ascii_art(self):
+        art = f"""{Colors.CYAN}
+  _____                _     _        ___    ____                    
+ |_   _| __ _   _  _ _| |__  | |__    ( _ )  |  _ \\   __ _  _ __  ___ 
+   | |  '__/ _` | | | | __| | '_ \\   / _ \\  | | | | / _` || '__|/ _ \\
+   | | |  | (_| | |_| | |_  | | | | | (_) | | |_| || (_| || |  |  __/
+   |_|___\\__,_|\\__,_|\\__| |_| |_|  \\___/  |____/  \\__,_||_|   \\___|
+        {Colors.ENDC}"""
+        print(art)
+
+    # Task 2: Player Registration Logic
     def setup_players(self):
         self.clear_screen()
-        print("=============================================")
-        print("         🎯 PLAYER REGISTRATION 🎯           ")
-        print("=============================================\n")
+        self.show_ascii_art()
         
         while True:
             try:
-                num = int(input("How many players are playing? (Min 2): "))
+                num = int(input(f"{Colors.BOLD}How many players are playing? (Min 2): {Colors.ENDC}"))
                 if num >= 2:
                     break
-                print("At least 2 players are required to play this game!")
+                print(f"{Colors.FAIL}At least 2 players are required to play this game!{Colors.ENDC}")
             except ValueError:
-                print("Invalid input! Please enter a valid number.")
+                print(f"{Colors.FAIL}Invalid input! Please enter a valid number.{Colors.ENDC}")
 
         for i in range(num):
             while True:
@@ -75,28 +86,40 @@ class TruthAndDareGame:
                 if name:
                     self.players.append(Player(name))
                     break
-                print("Player name cannot be empty!")
+                print(f"{Colors.FAIL}Player name cannot be empty!{Colors.ENDC}")
 
-        print(f"\n All {len(self.players)} players registered successfully!")
-        input("\nPress Enter to continue...")
+        print(f"\n{Colors.GREEN}All {len(self.players)} players registered successfully!{Colors.ENDC}")
+        input(f"\nPress {Colors.BOLD}Enter{Colors.ENDC} to continue...")
 
+    # Suspense animation logic
+    def spin_bottle(self):
+        print(f"{Colors.BLUE}🍾 Spinning the bottle...{Colors.ENDC}")
+        for _ in range(4):
+            time.sleep(0.5)
+            print(f"{Colors.BLUE}.{Colors.ENDC}", end="", flush=True)
+            self.play_beep()
+        print("\n")
+
+    # Task 3: Main Game Loop
     def start_game_loop(self):
         while True:
             self.clear_screen()
             
-            print("\n=============================")
-            print("--- 📊 CURRENT SCOREBOARD ---")
+            # Colored Scoreboard
+            print(f"\n{Colors.BOLD}--- 📊 CURRENT SCOREBOARD ---{Colors.ENDC}")
             for p in self.players:
-                print(f"👤 {p.name}: {p.score} Points")
-            print("=============================\n")
+                print(f"👤 {p.name}: {Colors.WARNING}{p.score}{Colors.ENDC} Points")
+            print("-----------------------------\n")
+
+            self.spin_bottle()
 
             current_player = random.choice(self.players)
-            print(f"🎯 Target Locked! It is turn of: {current_player.name.upper()}!")
+            self.play_beep()
+            print(f"🎯 Target Locked! It is turn of: {Colors.BOLD}{Colors.FAIL}{current_player.name.upper()}{Colors.ENDC}!")
 
-            choice = input("\nChoose (T)ruth or (D)are? [Or type 'quit' to exit]: ").lower().strip()
+            choice = input(f"\nChoose {Colors.CYAN}(T)ruth{Colors.ENDC} or {Colors.FAIL}(D)are{Colors.ENDC}? [Or type 'quit' to exit]: ").lower().strip()
 
             if choice == 'quit':
-                print("\nExiting the game loop...")
                 break
             
             elif choice in ['t', 'truth']:
@@ -104,7 +127,7 @@ class TruthAndDareGame:
                     self.truths = list(self.original_truths)
                 task = random.choice(self.truths)
                 self.truths.remove(task)
-                print(f"\n🤔 TRUTH FOR {current_player.name.upper()}:\n👉 {task}")
+                print(f"\n{Colors.CYAN}🤔 TRUTH FOR {current_player.name.upper()}:{Colors.ENDC}\n👉 {Colors.BOLD}{task}{Colors.ENDC}")
                 
             elif choice in ['d', 'dare']:
                 if not self.dares:
@@ -116,10 +139,10 @@ class TruthAndDareGame:
                     others = [p.name for p in self.players if p.name != current_player.name]
                     target = random.choice(others) if others else "a friend"
                     task = task.format(target)
-                print(f"\n⚡ DARE FOR {current_player.name.upper()}:\n👉 {task}")
+                print(f"\n{Colors.FAIL}⚡ DARE FOR {current_player.name.upper()}:{Colors.ENDC}\n👉 {Colors.BOLD}{Colors.WARNING}{task}{Colors.ENDC}")
                 
             else:
-                print("\nInvalid input! Round skipped.")
+                print(f"{Colors.WARNING}\nInvalid input! Round skipped.{Colors.ENDC}")
                 time.sleep(1.5)
                 continue
 
@@ -127,14 +150,26 @@ class TruthAndDareGame:
             status = input("Did you complete the task? (Y)es / (N)o: ").lower().strip()
             
             if status in ['y', 'yes']:
-                print(f"🎉 Great job! +10 Points!")
+                print(f"🎉 {Colors.GREEN}+10 Points!{Colors.ENDC}")
                 current_player.add_points(10)
             else:
-                print(f"👎 Sneaky or scared! -5 Points!")
+                print(f"👎 {Colors.FAIL}-5 Points! Sneaky!{Colors.ENDC}")
                 current_player.deduct_points(5)
 
-            input("\nPress Enter for the next round...")
+            input(f"\nPress {Colors.BOLD}Enter{Colors.ENDC} for the next round...")
 
+        self.end_game()
+
+    # End-game summary and winner calculation
+    def end_game(self):
+        self.clear_screen()
+        print(f"{Colors.HEADER}============================================={Colors.ENDC}")
+        print(f"{Colors.HEADER}               🎮 GAME OVER 🎮                {Colors.ENDC}")
+        print(f"{Colors.HEADER}=============================================\n")
+        
+        winner = max(self.players, key=lambda p: p.score)
+        print(f"🏆 The ultimate player is: {Colors.GREEN}{Colors.BOLD}{winner.name.upper()}{Colors.ENDC} ({winner.score} Points)!\n")
+        print("Thanks for playing! Goodbye.")
 
 if __name__ == "__main__":
     game = TruthAndDareGame()
